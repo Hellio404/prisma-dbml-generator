@@ -1,7 +1,7 @@
 {
-  "name": "prisma-dbml-generator",
-  "version": "0.11.0-dev.0",
-  "description": "Prisma DBML Generator",
+  "name": "prisma-dbml-generator-mod",
+  "version": "0.1",
+  "description": "Prisma DBML Generator Modified",
   "bin": "./dist/generator.js",
   "scripts": {
     "build": "tsc -p .",
@@ -21,30 +21,31 @@
     "test": "jest",
     "test:coverage": "jest --coverage"
   },
-  "keywords": [
-    "prisma",
-    "dbml",
-    "generator"
-  ],
+  "keywords": [],
   "contributors": [
     {
       "name": "Marc Stammerjohann"
     },
     {
       "name": "Gary Großgarten"
+    },
+    {
+      "name": "Youness FARINI"
     }
   ],
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/notiz-dev/prisma-dbml-generator.git"
+    "url": "https://github.com/Hellio404/prisma-dbml-generator"
   },
   "bugs": {
-    "url": "https://github.com/notiz-dev/prisma-dbml-generator/issues"
+    "url": "https://github.com/Hellio404/prisma-dbml-generator/issues"
   },
   "dependencies": {
+    "@loancrate/prisma-schema-parser": "^2.0.0",
     "@prisma/generator-helper": "4.13.0",
-    "@prisma/internals": "4.13.0"
+    "@prisma/internals": "4.13.0",
+    "change-case": "^4.1.2"
   },
   "devDependencies": {
     "@prisma/client": "4.13.0",

@@ -1,4 +1,5 @@
 import { DMMF } from '@prisma/generator-helper';
+import { snakeCase } from 'change-case';
 import { getModelByType } from './model';
 
 export const oneToOne = '-';
@@ -6,10 +7,13 @@ export const oneToMany = '<';
 export const manyToOne = '>';
 
 export function generateRelations(
+  config: any,
   models: DMMF.Model[],
-  mapToDbSchema: boolean = false
+  mappingName: any,
+  mapToDbSchema: boolean = true
 ): string[] {
   const refs: string[] = [];
+
   models.forEach((model) => {
     model.fields
       .filter(
@@ -19,7 +23,7 @@ export function generateRelations(
           field.relationFromFields?.length
       )
       .forEach((field) => {
-        const relationFrom = model.name;
+        const relationFrom = model.dbName || model.name;
         const relationTo = field.type;
 
         const relationOperator = getRelationOperator(
@@ -35,10 +39,22 @@ export function generateRelations(
           ? getModelByType(models, relationTo)?.dbName || relationTo
           : relationTo;
 
-        const ref = `Ref: ${relationFormName}.${combineKeys(
-          field.relationFromFields!
-        )} ${relationOperator} ${relationToName}.${combineKeys(
-          field.relationToFields!!
+        let quote = config.useQuotesForFields ? '"' : '';
+
+		let modelNameTranformer = config.useSnakeCase ? snakeCase : (name: string) => name;
+
+        const ref = `Ref: ${quote}${modelNameTranformer(
+          relationFormName
+        )}${quote}.${combineKeys(
+          field.relationFromFields!.map(
+            (e) => mappingName[relationFormName][e].name
+          ),
+          quote
+        )} ${relationOperator} ${quote}${modelNameTranformer(relationToName)}${quote}.${combineKeys(
+          field.relationToFields!.map(
+            (e) => mappingName[relationToName][e].name
+          ),
+          quote
         )}`;
 
         const referentialActions = getReferentialActions(
@@ -65,8 +81,10 @@ const getRelationOperator = (
 
 // Composite foreign keys:
 // Ref: merchant_periods.(merchant_id, country_code) > merchants.(id, country_code)
-const combineKeys = (keys: string[]): string => {
-  return keys.length > 1 ? `(${keys.join(', ')})` : keys[0];
+const combineKeys = (keys: string[], quote: string): string => {
+  return keys.length > 1
+    ? `(${keys.map((key) => `${quote}${key}${quote}`).join(', ')})`
+    : `${quote}${keys[0]}${quote}`;
 };
 
 const getReferentialActions = (
@@ -78,7 +96,11 @@ const getReferentialActions = (
   const field = model?.fields.find((field) => field.type === to);
   const referentialActions: string[] = [];
 
-  if (field?.relationOnDelete) {
+  if (
+    field?.relationOnDelete &&
+    (referentialActionsMap.get(field.relationOnDelete) ||
+      field.relationOnDelete) != 'No Action'
+  ) {
     referentialActions.push(
       `delete: ${
         referentialActionsMap.get(field.relationOnDelete) ||
