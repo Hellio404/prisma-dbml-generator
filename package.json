@@ -1,6 +1,6 @@
 {
   "name": "prisma-dbml-generator-mod",
-  "version": "0.1",
+  "version": "0.1.0",
   "description": "Prisma DBML Generator Modified",
   "bin": "./dist/generator.js",
   "scripts": {

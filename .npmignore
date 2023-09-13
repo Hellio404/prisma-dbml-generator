@@ -9,6 +9,7 @@ src/
 jest.config.js
 docker-compose.db.yml
 .env
+bun.lockb
 
 # misc
 .DS_Store
